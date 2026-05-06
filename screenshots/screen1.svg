@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844">
+  <rect width="390" height="844" fill="#f8f9fa"/>
+  <rect width="390" height="64" fill="#1d3557"/>
+  <circle cx="32" cy="32" r="18" fill="#e63946"/>
+  <text x="32" y="37" text-anchor="middle" font-size="14" fill="white" font-family="Arial">📍</text>
+  <text x="62" y="30" font-size="14" font-weight="bold" font-family="Arial" fill="white">LokalnieOSW</text>
+  <text x="62" y="46" font-size="10" font-family="Arial" fill="rgba(255,255,255,0.8)">Oświęcim &amp; okolice</text>
+  <rect x="0" y="64" width="390" height="40" fill="white"/>
+  <text x="20" y="89" font-size="12" font-family="Arial" fill="#1d3557">🏪 Wszystkie</text>
+  <text x="110" y="89" font-size="12" font-family="Arial" fill="#666">💻 Elektronika</text>
+  <text x="230" y="89" font-size="12" font-family="Arial" fill="#666">🏠 Dom</text>
+  <rect x="0" y="104" width="390" height="572" fill="#e8f0e8"/>
+  <circle cx="195" cy="380" r="160" stroke="#457b9d" stroke-width="2" fill="rgba(69,123,157,0.1)" stroke-dasharray="8 4"/>
+  <circle cx="195" cy="300" r="8" fill="#e63946"/>
+  <circle cx="230" cy="340" r="8" fill="#1d3557"/>
+  <circle cx="160" cy="360" r="8" fill="#f4a261"/>
+  <rect x="0" y="676" width="390" height="68" fill="#1d3557"/>
+  <text x="40" y="706" text-anchor="middle" font-size="20" font-family="Arial">🏠</text>
+  <text x="40" y="722" text-anchor="middle" font-size="10" font-family="Arial" fill="rgba(255,255,255,0.7)">Główna</text>
+  <text x="120" y="706" text-anchor="middle" font-size="20" font-family="Arial">💬</text>
+  <text x="120" y="722" text-anchor="middle" font-size="10" font-family="Arial" fill="rgba(255,255,255,0.7)">Czat</text>
+  <circle cx="195" cy="700" r="24" fill="#e63946"/>
+  <text x="195" y="706" text-anchor="middle" font-size="20" font-family="Arial">+</text>
+  <text x="270" y="706" text-anchor="middle" font-size="20" font-family="Arial">👤</text>
+  <text x="270" y="722" text-anchor="middle" font-size="10" font-family="Arial" fill="rgba(255,255,255,0.7)">Konto</text>
+</svg>

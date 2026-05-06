@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="80" fill="#1d3557"/>
+  <circle cx="256" cy="200" r="90" fill="#e63946"/>
+  <circle cx="256" cy="200" r="50" fill="white"/>
+  <path d="M256 290 Q200 360 256 450 Q312 360 256 290Z" fill="#e63946"/>
+  <text x="256" y="480" text-anchor="middle" font-size="52" font-weight="bold" font-family="Arial" fill="white">OSW</text>
+</svg>

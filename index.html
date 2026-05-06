@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <meta name="description" content="LokalnieOSW – lokalny marketplace Oświęcim. Kupuj i sprzedawaj lokalnie z rezerwacją i bezpiecznym depozytem."/>
+  <meta name="theme-color" content="#0e0e14"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="LokalnieOSW"/>
+  <meta property="og:title" content="LokalnieOSW – Lokalny Marketplace"/>
+  <meta property="og:description" content="Kupuj i sprzedawaj lokalnie w Oświęcimiu"/>
+  <meta property="og:type" content="website"/>
+  <title>LokalnieOSW – Lokalny Marketplace</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icons/icon-192.png"/>
+  <link rel="apple-touch-icon" href="icons/icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ LOADING OVERLAY ═══ -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-inner">
+    <div class="loading-logo">
+      <span class="loading-icon">📍</span>
+      <span class="loading-brand">LokalnieOSW</span>
+    </div>
+    <div class="loading-bar"><div class="loading-fill"></div></div>
+    <p class="loading-text">Ładowanie ogłoszeń…</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ TOAST ═══ -->
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<!-- ═══════════════════════════════════════ SIDEBAR ═══ -->
+<aside id="sidebar" class="sidebar" role="navigation" aria-label="Menu boczne">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <span class="sidebar-brand-icon">📍</span>
+      <div>
+        <div class="sidebar-brand-name">LokalnieOSW</div>
+        <div class="sidebar-brand-sub">Lokalny Marketplace</div>
+      </div>
+    </div>
+    <button class="sidebar-close" id="sidebarClose" aria-label="Zamknij menu">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <!-- user panel -->
+  <div class="sidebar-user" id="sidebarUser">
+    <div class="sidebar-avatar" id="sidebarAvatar">?</div>
+    <div class="sidebar-user-info">
+      <div class="sidebar-user-name" id="sidebarUserName">Gość</div>
+      <div class="sidebar-user-email" id="sidebarUserEmail">Zaloguj się aby sprzedawać</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a href="#" class="sidebar-link" onclick="App.showView('home');closeSidebar()">
+      <i class="fa fa-home"></i><span>Strona główna</span>
+    </a>
+    <a href="#" class="sidebar-link" onclick="App.showView('dashboard');closeSidebar()" id="dashLink" style="display:none">
+      <i class="fa fa-chart-bar"></i><span>Moje ogłoszenia</span>
+    </a>
+    <a href="#" class="sidebar-link" onclick="App.showView('messages');closeSidebar()" id="messagesLink" style="display:none">
+      <i class="fa fa-comments"></i><span>Wiadomości</span>
+      <span class="sidebar-badge" id="sidebarMsgBadge" style="display:none">0</span>
+    </a>
+    <a href="#" class="sidebar-link sidebar-link-cta" onclick="openModal('addListingModal');closeSidebar()" id="addLink" style="display:none">
+      <i class="fa fa-plus"></i><span>Dodaj ogłoszenie</span>
+    </a>
+    <a href="#" class="sidebar-link sidebar-link-admin" onclick="App.showView('admin');closeSidebar()" id="adminLink" style="display:none">
+      <i class="fa fa-shield-halved"></i><span>Panel Admina</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-divider"></div>
+
+  <nav class="sidebar-nav sidebar-nav-secondary">
+    <a href="#" class="sidebar-link" onclick="App.showStaticPage('about');closeSidebar()">
+      <i class="fa fa-info-circle"></i><span>O nas</span>
+    </a>
+    <a href="#" class="sidebar-link" onclick="App.showStaticPage('pricing');closeSidebar()">
+      <i class="fa fa-tag"></i><span>Cennik</span>
+    </a>
+    <a href="#" class="sidebar-link" onclick="App.showStaticPage('terms');closeSidebar()">
+      <i class="fa fa-file-alt"></i><span>Regulamin</span>
+    </a>
+    <a href="#" class="sidebar-link" onclick="openModal('donateModal');closeSidebar()">
+      <i class="fa fa-heart"></i><span>Wesprzyj projekt</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="sidebar-logout" id="sidebarLogoutBtn" onclick="Auth.logout()" style="display:none">
+      <i class="fa fa-sign-out-alt"></i> Wyloguj się
+    </button>
+    <div class="sidebar-version">v2.1.0 · Oświęcim ❤️</div>
+  </div>
+</aside>
+<div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════════════════════════════ NAVBAR ═══ -->
+<header class="navbar" id="navbar">
+  <div class="navbar-left">
+    <button class="nav-icon-btn" id="menuBtn" aria-label="Menu" onclick="openSidebar()">
+      <i class="fa fa-bars"></i>
+    </button>
+    <a href="#" class="navbar-brand" onclick="App.showView('home')">
+      <span class="navbar-brand-icon">📍</span>
+      <span class="navbar-brand-text">LokalnieOSW</span>
+    </a>
+  </div>
+
+  <div class="navbar-search" id="navbarSearch">
+    <i class="fa fa-search navbar-search-icon"></i>
+    <input type="search" id="globalSearch" class="navbar-search-input"
+           placeholder="Szukaj ogłoszeń…" autocomplete="off" spellcheck="false"/>
+    <button class="navbar-search-clear" id="searchClearBtn" aria-label="Wyczyść" style="display:none">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <div class="navbar-right">
+    <button class="nav-icon-btn notify-btn" id="notifyBtn" aria-label="Powiadomienia" style="display:none">
+      <i class="fa fa-bell"></i>
+      <span class="nav-badge" id="notifyBadge" style="display:none">0</span>
+    </button>
+    <button class="nav-icon-btn" id="navLoginBtn" onclick="openModal('authModal')" aria-label="Zaloguj się">
+      <i class="fa fa-user"></i>
+    </button>
+    <button class="nav-add-btn" id="navAddBtn" onclick="openModal('addListingModal')" style="display:none" aria-label="Dodaj ogłoszenie">
+      <i class="fa fa-plus"></i><span>Dodaj</span>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════ FILTER BAR ═══ -->
+<div class="filter-bar" id="filterBar">
+  <!-- Category chips -->
+  <div class="category-chips" id="categoryChips" role="tablist" aria-label="Kategorie">
+    <button class="chip chip-active" data-cat="all" role="tab" aria-selected="true" onclick="App.filterByCategory('all')">
+      <span class="chip-emoji">🏪</span><span>Wszystkie</span>
+    </button>
+    <button class="chip" data-cat="electronics" role="tab" onclick="App.filterByCategory('electronics')">
+      <span class="chip-emoji">💻</span><span>Elektronika</span>
+    </button>
+    <button class="chip" data-cat="clothing" role="tab" onclick="App.filterByCategory('clothing')">
+      <span class="chip-emoji">👗</span><span>Odzież</span>
+    </button>
+    <button class="chip" data-cat="furniture" role="tab" onclick="App.filterByCategory('furniture')">
+      <span class="chip-emoji">🪑</span><span>Meble</span>
+    </button>
+    <button class="chip" data-cat="sports" role="tab" onclick="App.filterByCategory('sports')">
+      <span class="chip-emoji">⚽</span><span>Sport</span>
+    </button>
+    <button class="chip" data-cat="books" role="tab" onclick="App.filterByCategory('books')">
+      <span class="chip-emoji">📚</span><span>Książki</span>
+    </button>
+    <button class="chip" data-cat="kids" role="tab" onclick="App.filterByCategory('kids')">
+      <span class="chip-emoji">🧸</span><span>Dzieci</span>
+    </button>
+    <button class="chip" data-cat="home" role="tab" onclick="App.filterByCategory('home')">
+      <span class="chip-emoji">🏡</span><span>Dom</span>
+    </button>
+    <button class="chip" data-cat="other" role="tab" onclick="App.filterByCategory('other')">
+      <span class="chip-emoji">📦</span><span>Inne</span>
+    </button>
+  </div>
+
+  <!-- Advanced filter toggle -->
+  <button class="filter-adv-btn" id="advFilterBtn" onclick="toggleAdvFilters()" aria-expanded="false" aria-controls="advFilters">
+    <i class="fa fa-sliders-h"></i>
+    <span>Filtry</span>
+    <span class="filter-active-dot" id="filterActiveDot" style="display:none"></span>
+  </button>
+</div>
+
+<!-- Advanced Filters Panel -->
+<div class="adv-filters" id="advFilters" aria-hidden="true">
+  <div class="adv-filters-inner">
+    <div class="adv-filter-group">
+      <label class="adv-label">Cena (zł)</label>
+      <div class="price-range-inputs">
+        <div class="price-input-wrap">
+          <input type="number" id="priceMin" class="price-input" placeholder="Od" min="0"/>
+          <span class="currency-label">zł</span>
+        </div>
+        <span class="price-sep">–</span>
+        <div class="price-input-wrap">
+          <input type="number" id="priceMax" class="price-input" placeholder="Do" min="0"/>
+          <span class="currency-label">zł</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="adv-filter-group">
+      <label class="adv-label" for="conditionFilter">Stan</label>
+      <select id="conditionFilter" class="adv-select">
+        <option value="">Wszystkie</option>
+        <option value="new">Nowy</option>
+        <option value="like_new">Jak nowy</option>
+        <option value="good">Dobry</option>
+        <option value="fair">Zadowalający</option>
+      </select>
+    </div>
+
+    <div class="adv-filter-group">
+      <label class="adv-label">Dystans: <span id="distanceVal">20</span> km</label>
+      <input type="range" id="distanceSlider" class="distance-slider" min="1" max="50" value="20"
+             oninput="updateDistanceLabel(this.value)"/>
+    </div>
+
+    <div class="adv-filter-toggles">
+      <label class="toggle-item">
+        <span class="toggle-label">Tylko dostępne</span>
+        <span class="sw">
+          <input type="checkbox" id="availableOnly" onchange="App.applyFilters()"/>
+          <span class="sw-track"></span>
+        </span>
+      </label>
+      <label class="toggle-item">
+        <span class="toggle-label">Z rezerwacją</span>
+        <span class="sw">
+          <input type="checkbox" id="reservationOnly" onchange="App.applyFilters()"/>
+          <span class="sw-track"></span>
+        </span>
+      </label>
+    </div>
+
+    <div class="adv-filter-actions">
+      <button class="adv-reset-btn" onclick="App.resetFilters()">
+        <i class="fa fa-undo"></i> Resetuj
+      </button>
+      <button class="adv-apply-btn" onclick="App.applyFilters();toggleAdvFilters()">
+        Zastosuj filtry
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ MAIN CONTENT ═══ -->
+<main class="main-content" id="mainContent">
+
+  <!-- ─── HOME VIEW ─── -->
+  <section id="homeView" class="view view-home active">
+
+    <!-- View toggle -->
+    <div class="view-toggle-bar" id="viewToggleBar">
+      <div class="view-toggle-group">
+        <button class="view-toggle-btn active" id="mapViewBtn" onclick="App.switchView('map')" aria-pressed="true">
+          <i class="fa fa-map"></i><span>Mapa</span>
+        </button>
+        <button class="view-toggle-btn" id="listViewBtn" onclick="App.switchView('list')" aria-pressed="false">
+          <i class="fa fa-th-large"></i><span>Lista</span>
+        </button>
+      </div>
+      <div class="results-count" id="resultsCount">
+        <span id="resultsNum">0</span> ogłoszeń
+      </div>
+      <div class="sort-wrap">
+        <select id="sortSelect" class="sort-select" onchange="App.applyFilters()">
+          <option value="featured">Wyróżnione</option>
+          <option value="newest">Najnowsze</option>
+          <option value="price_asc">Cena ↑</option>
+          <option value="price_desc">Cena ↓</option>
+          <option value="popular">Popularne</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Map container -->
+    <div id="mapContainer" class="map-container">
+      <div id="map" class="map-element"></div>
+      <!-- Map controls -->
+      <div class="map-controls">
+        <button class="map-ctrl-btn" onclick="MapModule.locateUser()" title="Moja lokalizacja" aria-label="Moja lokalizacja">
+          <i class="fa fa-location-crosshairs"></i>
+        </button>
+        <button class="map-ctrl-btn" onclick="MapModule.resetView()" title="Reset widoku" aria-label="Reset widoku">
+          <i class="fa fa-compress-arrows-alt"></i>
+        </button>
+      </div>
+      <!-- Floating count badge -->
+      <div class="map-count-badge" id="mapCountBadge">
+        <i class="fa fa-tag"></i> <span id="mapCount">0</span>
+      </div>
+    </div>
+
+    <!-- List container (hidden by default) -->
+    <div id="listContainer" class="list-container" style="display:none">
+      <div id="listingsGrid" class="listings-grid"></div>
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="empty-icon">🔍</div>
+        <h3>Brak ogłoszeń</h3>
+        <p>Spróbuj zmienić filtry lub kategorię</p>
+        <button onclick="App.resetFilters()" class="empty-cta-btn">Pokaż wszystkie</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ─── MESSAGES VIEW ─── -->
+  <section id="messagesView" class="view" style="display:none">
+    <div class="view-header">
+      <h2 class="view-title">Wiadomości</h2>
+      <span class="view-subtitle" id="unreadCount"></span>
+    </div>
+    <div id="chatList" class="chat-list"></div>
+    <div id="chatWindow" class="chat-window" style="display:none">
+      <div class="chat-header" id="chatHeader"></div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-bar" id="chatInputBar">
+        <button class="chat-offer-btn" id="chatOfferBtn" onclick="Chat.sendQuickOffer()" title="Zaproponuj cenę">
+          <i class="fa fa-tag"></i>
+        </button>
+        <input type="text" id="chatInput" class="chat-input" placeholder="Napisz wiadomość…" maxlength="500"/>
+        <button class="chat-send-btn" onclick="Chat.sendMessage()" aria-label="Wyślij">
+          <i class="fa fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+    <div id="chatEmpty" class="chat-empty">
+      <div class="empty-icon">💬</div>
+      <p>Brak wiadomości</p>
+      <p class="text-muted">Znajdź ogłoszenie i napisz do sprzedającego</p>
+    </div>
+  </section>
+
+  <!-- ─── DASHBOARD VIEW ─── -->
+  <section id="dashboardView" class="view" style="display:none">
+    <div class="view-header">
+      <h2 class="view-title">Moje ogłoszenia</h2>
+      <button class="view-header-btn" onclick="openModal('addListingModal')">
+        <i class="fa fa-plus"></i> Dodaj nowe
+      </button>
+    </div>
+
+    <!-- Stats row -->
+    <div class="dash-stats" id="dashStats">
+      <div class="stat-card">
+        <div class="stat-icon" style="color:var(--brand)"><i class="fa fa-list"></i></div>
+        <div class="stat-value" id="statTotal">0</div>
+        <div class="stat-label">Ogłoszeń</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color:var(--amber)"><i class="fa fa-eye"></i></div>
+        <div class="stat-value" id="statViews">0</div>
+        <div class="stat-label">Wyświetleń</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color:var(--blue)"><i class="fa fa-calendar-check"></i></div>
+        <div class="stat-value" id="statReservations">0</div>
+        <div class="stat-label">Rezerwacji</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="color:var(--red)"><i class="fa fa-check-circle"></i></div>
+        <div class="stat-value" id="statSold">0</div>
+        <div class="stat-label">Sprzedanych</div>
+      </div>
+    </div>
+
+    <div id="myListingsGrid" class="listings-grid"></div>
+    <div id="dashEmpty" class="empty-state" style="display:none">
+      <div class="empty-icon">📦</div>
+      <h3>Brak ogłoszeń</h3>
+      <p>Dodaj swoje pierwsze ogłoszenie i zacznij sprzedawać!</p>
+      <button onclick="openModal('addListingModal')" class="empty-cta-btn">
+        <i class="fa fa-plus"></i> Dodaj ogłoszenie
+      </button>
+    </div>
+  </section>
+
+  <!-- ─── ADMIN VIEW ─── -->
+  <section id="adminView" class="view" style="display:none">
+    <div class="view-header">
+      <h2 class="view-title"><i class="fa fa-shield-halved"></i> Panel Admina</h2>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('overview')" id="tabOverview">Przegląd</button>
+      <button class="admin-tab" onclick="switchAdminTab('listings')" id="tabListings">Ogłoszenia</button>
+      <button class="admin-tab" onclick="switchAdminTab('users')" id="tabUsers">Użytkownicy</button>
+      <button class="admin-tab" onclick="switchAdminTab('reservations')" id="tabReservations">Rezerwacje</button>
+    </div>
+    <div id="adminContent" class="admin-content"></div>
+  </section>
+
+  <!-- ─── STATIC PAGES ─── -->
+  <section id="staticView" class="view" style="display:none">
+    <div class="static-back">
+      <button class="back-btn" onclick="App.showView('home')">
+        <i class="fa fa-arrow-left"></i> Powrót
+      </button>
+    </div>
+    <div id="staticContent" class="static-content"></div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════ BOTTOM NAV ═══ -->
+<nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="Nawigacja główna">
+  <button class="bnav-btn active" id="bnavHome" onclick="App.showView('home')" aria-label="Strona główna">
+    <i class="fa fa-home"></i>
+    <span>Główna</span>
+  </button>
+  <button class="bnav-btn" id="bnavMessages" onclick="App.showView('messages')" aria-label="Wiadomości" style="display:none">
+    <i class="fa fa-comments"></i>
+    <span>Wiadomości</span>
+    <span class="bnav-badge" id="bnavMsgBadge" style="display:none">0</span>
+  </button>
+  <button class="bnav-btn bnav-add" id="bnavAdd" onclick="openModal('addListingModal')" aria-label="Dodaj ogłoszenie" style="display:none">
+    <span class="bnav-add-inner"><i class="fa fa-plus"></i></span>
+  </button>
+  <button class="bnav-btn" id="bnavDash" onclick="App.showView('dashboard')" aria-label="Moje ogłoszenia" style="display:none">
+    <i class="fa fa-chart-bar"></i>
+    <span>Moje</span>
+  </button>
+  <button class="bnav-btn" id="bnavLogin" onclick="openModal('authModal')" aria-label="Konto">
+    <i class="fa fa-user"></i>
+    <span>Konto</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════ SCROLL TO TOP ═══ -->
+<button id="scrollTopBtn" class="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Na górę" style="display:none">
+  <i class="fa fa-arrow-up"></i>
+</button>
+
+<!-- ═══════════════════════════════════════ MODALS ═══ -->
+
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Logowanie / Rejestracja">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title">Witaj w LokalnieOSW</h2>
+      <button class="modal-close" onclick="closeModal('authModal')" aria-label="Zamknij"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTabBtn" onclick="Auth.switchTab('login')">Logowanie</button>
+      <button class="auth-tab" id="registerTabBtn" onclick="Auth.switchTab('register')">Rejestracja</button>
+    </div>
+    <!-- Login form -->
+    <form id="loginForm" class="auth-form" onsubmit="event.preventDefault();Auth.loginEmail()">
+      <button type="button" class="google-btn" onclick="Auth.loginGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Kontynuuj z Google
+      </button>
+      <div class="auth-divider"><span>lub</span></div>
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">E-mail</label>
+        <input type="email" id="loginEmail" class="form-input" placeholder="twoj@email.pl" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Hasło</label>
+        <div class="input-password-wrap">
+          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" autocomplete="current-password"/>
+          <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')" aria-label="Pokaż/ukryj hasło">
+            <i class="fa fa-eye" id="loginPasswordIcon"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary btn-full">Zaloguj się</button>
+      <p class="auth-demo-hint">
+        <i class="fa fa-info-circle"></i> Demo: <code>admin@lokalnieosw.pl</code> / <code>admin123</code>
+      </p>
+    </form>
+    <!-- Register form -->
+    <form id="registerForm" class="auth-form" style="display:none" onsubmit="event.preventDefault();Auth.register()">
+      <div class="form-group">
+        <label class="form-label" for="regName">Imię i nazwisko</label>
+        <input type="text" id="regName" class="form-input" placeholder="Jan Kowalski" autocomplete="name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regEmail">E-mail</label>
+        <input type="email" id="regEmail" class="form-input" placeholder="twoj@email.pl" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regPhone">Telefon (opcjonalnie)</label>
+        <input type="tel" id="regPhone" class="form-input" placeholder="+48 500 000 000" autocomplete="tel"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regPassword">Hasło (min. 8 znaków)</label>
+        <div class="input-password-wrap">
+          <input type="password" id="regPassword" class="form-input" placeholder="••••••••" autocomplete="new-password"/>
+          <button type="button" class="password-toggle" onclick="togglePassword('regPassword')" aria-label="Pokaż/ukryj hasło">
+            <i class="fa fa-eye" id="regPasswordIcon"></i>
+          </button>
+        </div>
+      </div>
+      <label class="form-checkbox">
+        <input type="checkbox" id="regTerms"/>
+        <span>Akceptuję <a href="#" onclick="App.showStaticPage('terms')">Regulamin</a> i <a href="#" onclick="App.showStaticPage('privacy')">Politykę Prywatności</a></span>
+      </label>
+      <button type="submit" class="btn-primary btn-full">Utwórz konto</button>
+    </form>
+  </div>
+</div>
+
+<!-- LISTING DETAIL MODAL -->
+<div id="listingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Szczegóły ogłoszenia">
+  <div class="modal modal-lg">
+    <button class="modal-close modal-close-abs" onclick="closeModal('listingModal')" aria-label="Zamknij">
+      <i class="fa fa-times"></i>
+    </button>
+    <div id="listingModalContent"></div>
+  </div>
+</div>
+
+<!-- ADD LISTING MODAL -->
+<div id="addListingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Dodaj ogłoszenie">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fa fa-plus-circle"></i> Nowe ogłoszenie</h2>
+      <button class="modal-close" onclick="closeModal('addListingModal')" aria-label="Zamknij"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Photo upload -->
+      <div class="form-section">
+        <label class="form-section-label">Zdjęcia (max. 8)</label>
+        <div id="photoGrid" class="photo-grid">
+          <label class="photo-add-btn" for="photoInput" aria-label="Dodaj zdjęcia">
+            <i class="fa fa-camera"></i>
+            <span>Dodaj zdjęcia</span>
+          </label>
+          <input type="file" id="photoInput" accept="image/*" multiple style="display:none" onchange="App.handlePhotos(this)"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group form-group-grow">
+          <label class="form-label" for="listingTitle">Tytuł ogłoszenia *</label>
+          <input type="text" id="listingTitle" class="form-input" placeholder="Np. iPhone 13 Pro 128GB" maxlength="80"/>
+          <div class="char-counter"><span id="titleCounter">0</span>/80</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="listingPrice">Cena (zł) *</label>
+          <div class="price-input-wrap">
+            <input type="number" id="listingPrice" class="price-input" placeholder="0" min="0" step="0.01"/>
+            <span class="currency-label">zł</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="listingCategory">Kategoria *</label>
+          <select id="listingCategory" class="adv-select">
+            <option value="">Wybierz…</option>
+            <option value="electronics">💻 Elektronika</option>
+            <option value="clothing">👗 Odzież</option>
+            <option value="furniture">🪑 Meble</option>
+            <option value="sports">⚽ Sport</option>
+            <option value="books">📚 Książki</option>
+            <option value="kids">🧸 Dzieci</option>
+            <option value="home">🏡 Dom i ogród</option>
+            <option value="other">📦 Inne</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="listingCondition">Stan *</label>
+          <select id="listingCondition" class="adv-select">
+            <option value="">Wybierz…</option>
+            <option value="new">Nowy</option>
+            <option value="like_new">Jak nowy</option>
+            <option value="good">Dobry</option>
+            <option value="fair">Zadowalający</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="listingDescription">Opis</label>
+        <textarea id="listingDescription" class="form-textarea" rows="4" placeholder="Opisz przedmiot, stan, powód sprzedaży…" maxlength="2000"></textarea>
+      </div>
+
+      <!-- Location -->
+      <div class="form-section">
+        <label class="form-section-label"><i class="fa fa-map-marker-alt"></i> Lokalizacja</label>
+        <div class="form-row">
+          <div class="form-group form-group-grow">
+            <input type="text" id="listingLocation" class="form-input" placeholder="Oświęcim, ul. Przykładowa 1"/>
+          </div>
+          <button type="button" class="btn-outline" onclick="MapModule.initPicker()" id="pickLocationBtn">
+            <i class="fa fa-map-pin"></i> Zaznacz na mapie
+          </button>
+        </div>
+        <input type="hidden" id="listingLat"/>
+        <input type="hidden" id="listingLng"/>
+        <div id="locationPicker" class="location-picker" style="display:none">
+          <div id="pickerMap" class="picker-map"></div>
+        </div>
+      </div>
+
+      <!-- Reservation toggle -->
+      <div class="form-section">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-title">Rezerwacja z depozytem</div>
+            <div class="toggle-desc">Kupujący wpłaci kaucję zabezpieczającą spotkanie</div>
+          </div>
+          <span class="sw">
+            <input type="checkbox" id="reservationToggle" onchange="toggleReservationOptions()"/>
+            <span class="sw-track"></span>
+          </span>
+        </div>
+        <div id="reservationOptions" style="display:none" class="reservation-options">
+          <label class="adv-label">Procent depozytu: <strong id="depositPctLabel">15%</strong></label>
+          <input type="range" id="depositPct" class="distance-slider" min="5" max="30" value="15"
+                 oninput="document.getElementById('depositPctLabel').textContent=this.value+'%'"/>
+          <p class="hint-text"><i class="fa fa-shield-alt"></i> 70% depozytu trafia do Ciebie jeśli kupujący nie odbierze • 30% prowizja platformy</p>
+        </div>
+      </div>
+
+      <!-- Featured -->
+      <div class="form-section">
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-title">✨ Wyróżnij ogłoszenie</div>
+            <div class="toggle-desc">Twoje ogłoszenie pojawi się na górze wyników (4,99 zł)</div>
+          </div>
+          <span class="sw">
+            <input type="checkbox" id="featuredToggle"/>
+            <span class="sw-track"></span>
+          </span>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeModal('addListingModal')">Anuluj</button>
+      <button class="btn-primary" onclick="App.submitListing()">
+        <i class="fa fa-check"></i> Opublikuj ogłoszenie
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div id="paymentModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Płatność">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fa fa-lock"></i> Bezpieczna płatność</h2>
+      <button class="modal-close" onclick="closeModal('paymentModal')" aria-label="Zamknij"><i class="fa fa-times"></i></button>
+    </div>
+    <div id="paymentContent"></div>
+  </div>
+</div>
+
+<!-- OFFER PRICE MODAL -->
+<div id="offerModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Zaproponuj cenę">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fa fa-tag"></i> Zaproponuj cenę</h2>
+      <button class="modal-close" onclick="closeModal('offerModal')" aria-label="Zamknij"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="offerContent">
+      <p class="text-muted" id="offerCurrentPrice"></p>
+      <div class="form-group">
+        <label class="form-label" for="offerAmount">Twoja oferta (zł)</label>
+        <div class="price-input-wrap">
+          <input type="number" id="offerAmount" class="price-input" placeholder="0" min="1"/>
+          <span class="currency-label">zł</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="offerMessage">Wiadomość (opcjonalnie)</label>
+        <textarea id="offerMessage" class="form-textarea" rows="2" placeholder="Np. Odbiór osobisty, mam gotówkę…"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" onclick="closeModal('offerModal')">Anuluj</button>
+        <button class="btn-primary" onclick="Chat.sendOffer()">Wyślij ofertę</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PICKUP CONFIRMATION MODAL -->
+<div id="pickupModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Potwierdzenie odbioru">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title"><i class="fa fa-handshake"></i> Potwierdź odbiór</h2>
+      <button class="modal-close" onclick="closeModal('pickupModal')" aria-label="Zamknij"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="pickupContent"></div>
+  </div>
+</div>
+
+<!-- FEATURED PAYMENT MODAL -->
+<div id="featuredPayModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Płatność za wyróżnienie">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title">✨ Wyróżnij ogłoszenie</h2>
+      <button class="modal-close" onclick="closeModal('featuredPayModal')" aria-label="Zamknij"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="featuredPayContent"></div>
+  </div>
+</div>
+
+<!-- DONATE MODAL -->
+<div id="donateModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Wesprzyj projekt">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h2 class="modal-title">❤️ Wesprzyj LokalnieOSW</h2>
+      <button class="modal-close" onclick="closeModal('donateModal')" aria-label="Zamknij"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p class="text-muted">LokalnieOSW to projekt non-profit tworzony z miłości do lokalności. Twoja darowizna pomaga utrzymać serwer i rozwijać aplikację.</p>
+      <div class="donate-amounts">
+        <button class="donate-chip" onclick="selectDonate(5)">5 zł</button>
+        <button class="donate-chip" onclick="selectDonate(10)">10 zł</button>
+        <button class="donate-chip" onclick="selectDonate(20)">20 zł</button>
+        <button class="donate-chip" onclick="selectDonate(50)">50 zł</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="donateAmount">Inna kwota (zł)</label>
+        <div class="price-input-wrap">
+          <input type="number" id="donateAmount" class="price-input" placeholder="0" min="1"/>
+          <span class="currency-label">zł</span>
+        </div>
+      </div>
+      <button class="btn-primary btn-full" onclick="processDonate()">
+        <i class="fa fa-heart"></i> Przekaż darowiznę
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PWA INSTALL PROMPT -->
+<div id="installPrompt" class="install-prompt" style="display:none">
+  <div class="install-prompt-inner">
+    <span class="install-icon">📍</span>
+    <div class="install-text">
+      <strong>Zainstaluj aplikację</strong>
+      <span>Szybszy dostęp do ogłoszeń</span>
+    </div>
+    <div class="install-actions">
+      <button class="install-later" onclick="dismissInstall()">Później</button>
+      <button class="install-now" onclick="App.installPWA()">Instaluj</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ SCRIPTS ═══ -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/map.js"></script>
+<script src="js/reservations.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+// ── Global UI helpers ──────────────────────────────────────────
+function openModal(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  m.querySelector('[class*="modal"]')?.focus?.();
+}
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.remove('open');
+  if (!document.querySelector('.modal-overlay.open')) {
+    document.body.style.overflow = '';
+  }
+}
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function toggleAdvFilters() {
+  const panel = document.getElementById('advFilters');
+  const btn = document.getElementById('advFilterBtn');
+  const open = panel.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open);
+  panel.setAttribute('aria-hidden', !open);
+}
+function updateDistanceLabel(v) {
+  document.getElementById('distanceVal').textContent = v;
+  App.applyFilters();
+}
+function toggleReservationOptions() {
+  const show = document.getElementById('reservationToggle').checked;
+  document.getElementById('reservationOptions').style.display = show ? '' : 'none';
+}
+function togglePassword(id) {
+  const inp = document.getElementById(id);
+  const ico = document.getElementById(id + 'Icon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.className = 'fa fa-eye-slash';
+  } else {
+    inp.type = 'password';
+    ico.className = 'fa fa-eye';
+  }
+}
+function switchAdminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1))?.classList.add('active');
+  App.loadAdminTab(tab);
+}
+function selectDonate(amount) {
+  document.getElementById('donateAmount').value = amount;
+  document.querySelectorAll('.donate-chip').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+}
+function processDonate() {
+  const amt = document.getElementById('donateAmount').value;
+  if (!amt || amt < 1) { showToast('Wpisz kwotę darowizny', 'warning'); return; }
+  showToast(`Dziękujemy za wsparcie ${amt} zł! ❤️`, 'success');
+  closeModal('donateModal');
+}
+function dismissInstall() {
+  document.getElementById('installPrompt').style.display = 'none';
+  localStorage.setItem('installDismissed', Date.now());
+}
+function showToast(msg, type = 'info', duration = 3000) {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  const icons = { success:'check-circle', error:'exclamation-circle', warning:'exclamation-triangle', info:'info-circle' };
+  t.innerHTML = `<i class="fa fa-${icons[type]||'info-circle'}"></i><span>${msg}</span>`;
+  c.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, duration);
+}
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+});
+// Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const open = document.querySelector('.modal-overlay.open');
+    if (open) closeModal(open.id);
+    else if (document.getElementById('sidebar').classList.contains('open')) closeSidebar();
+    else if (document.getElementById('advFilters').classList.contains('open')) toggleAdvFilters();
+  }
+});
+// Search clear btn
+document.getElementById('globalSearch').addEventListener('input', function() {
+  document.getElementById('searchClearBtn').style.display = this.value ? '' : 'none';
+});
+document.getElementById('searchClearBtn').addEventListener('click', () => {
+  document.getElementById('globalSearch').value = '';
+  document.getElementById('searchClearBtn').style.display = 'none';
+  App.applyFilters();
+});
+</script>
+</body>
+</html>

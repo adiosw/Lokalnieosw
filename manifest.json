@@ -1,0 +1,47 @@
+{
+  "name": "LokalnieOSW – Lokalny Marketplace",
+  "short_name": "LokalnieOSW",
+  "description": "Lokalny marketplace dla Oświęcimia i okolic. Kupuj i sprzedawaj bezpiecznie z rezerwacją i depozytem.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0e0e14",
+  "background_color": "#0e0e14",
+  "lang": "pl",
+  "dir": "ltr",
+  "categories": ["shopping", "lifestyle", "social"],
+  "icons": [
+    { "src": "icons/icon-72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-128.png",  "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-144.png",  "sizes": "144x144", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-152.png",  "sizes": "152x152", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-384.png",  "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    { "src": "screenshots/screen-home.png",  "sizes": "390x844", "type": "image/png", "label": "Mapa ogłoszeń" },
+    { "src": "screenshots/screen-list.png",  "sizes": "390x844", "type": "image/png", "label": "Lista ogłoszeń" },
+    { "src": "screenshots/screen-detail.png","sizes": "390x844", "type": "image/png", "label": "Szczegóły ogłoszenia" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dodaj ogłoszenie",
+      "short_name": "Dodaj",
+      "description": "Szybko dodaj nowe ogłoszenie",
+      "url": "/#add-listing",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Moje ogłoszenia",
+      "short_name": "Moje",
+      "description": "Przejdź do swoich ogłoszeń",
+      "url": "/#dashboard",
+      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
