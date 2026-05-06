@@ -1,0 +1,2 @@
+# Lokalnieosw
+Lokalny marketplace Oświęcim
